@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -18,17 +19,17 @@ class MyFirstUITest {
     private static final String FORMS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Forms']";
     private static final String ELEMENTS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Elements']";
     private static final String WIDGETS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Widgets']";
+    private static final String FRAME_CARD_TEXT = "//div[@class='card-body']/h5[text()='Alerts, Frame & Windows']";
     private static final String SPAN_TEXT_RADIO_BUTTON = "//span[text()='Radio Button']";
     private static final String SPAN_TEXT_TEXT_BOX = "//span[text()='Text Box']";
     private static final String SPAN_TEXT_BUTTONS = "//span[text()='Buttons']";
     private static final String SPAN_TEXT_PROGRESSBAR = "//span[text()='Progress Bar']";
     private static final String SPAN_TEXT_TOOL_TIPS = "//span[text()='Tool Tips']";
     private static final String SPAN_TEXT_TABS = "//span[text()='Tabs']";
+    private static final String SPAN_TEXT_FRAMES = "//span[text()='Frames']";
     private static final String BUTTON_TEXT_CLICK_ME = "//button[text()='Click Me']";
     private static final String LABEL_FOR_YES_RADIO = "//label[@for='yesRadio']";
     private static final String SCROLL_INTO_VIEW_SCRIPT = "arguments[0].scrollIntoView(true)";
-    private static final String MOUSE_OVER_SCRIPT = "arguments[0].dispatchEvent(" +
-            "new MouseEvent('mouseover', {'view': window, 'bubbles': true, 'cancelable': true}));";
     WebDriver driver;
     JavascriptExecutor js;
 
@@ -130,7 +131,12 @@ class MyFirstUITest {
         WebElement toolTipsMenuItem = driver.findElement(By.xpath(SPAN_TEXT_TOOL_TIPS));
         toolTipsMenuItem.click();
         WebElement toolTipButton = driver.findElement(By.id("toolTipButton"));
-        js.executeScript(MOUSE_OVER_SCRIPT, toolTipButton);
+        new Actions(driver)
+                .pause(Duration.ofSeconds(3L))
+                .scrollToElement(toolTipButton)
+                .scrollByAmount(0,150)
+                .moveToElement(toolTipButton)
+                .perform();
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(1L));
         wait.until(ExpectedConditions.attributeToBe(toolTipButton, "aria-describedby", "buttonToolTip"));
         WebElement buttonToolTip = driver.findElement(By.id("buttonToolTip"));
@@ -151,12 +157,25 @@ class MyFirstUITest {
         assertFalse(Boolean.parseBoolean(hidden));
     }
 
+    @Test
+    void checkIFrameText() {
+        WebElement frameCard = driver.findElement(By.xpath(FRAME_CARD_TEXT));
+        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, frameCard);
+        frameCard.click();
+        WebElement framesMenuItem = driver.findElement(By.xpath(SPAN_TEXT_FRAMES));
+        framesMenuItem.click();
+        WebElement iFrame = driver.findElement(By.id("frame1"));
+        driver.switchTo().frame(iFrame);
+        WebElement inTheFrame = driver.findElement(By.id("sampleHeading"));
+        assertEquals("This is a sample page", inTheFrame.getText());
+    }
+
     @BeforeEach
     void setUp() {
         driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(300));
         js = (JavascriptExecutor) driver;
-        driver.get("https://demoqa.com/");
+        driver.get(ApplicationProperties.getBaseUrl());
     }
 
     @AfterEach
