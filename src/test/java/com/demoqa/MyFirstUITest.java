@@ -1,10 +1,10 @@
 package com.demoqa;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.demoqa.pages.RadioButtonPage;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
@@ -15,29 +15,13 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class MyFirstUITest {
-    private static final String FORMS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Forms']";
-    private static final String ELEMENTS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Elements']";
-    private static final String WIDGETS_CARD_TEXT = "//div[@class='card-body']/h5[text()='Widgets']";
-    private static final String FRAME_CARD_TEXT = "//div[@class='card-body']/h5[text()='Alerts, Frame & Windows']";
-    private static final String SPAN_TEXT_RADIO_BUTTON = "//span[text()='Radio Button']";
-    private static final String SPAN_TEXT_TEXT_BOX = "//span[text()='Text Box']";
-    private static final String SPAN_TEXT_BUTTONS = "//span[text()='Buttons']";
-    private static final String SPAN_TEXT_PROGRESSBAR = "//span[text()='Progress Bar']";
-    private static final String SPAN_TEXT_TOOL_TIPS = "//span[text()='Tool Tips']";
-    private static final String SPAN_TEXT_TABS = "//span[text()='Tabs']";
-    private static final String SPAN_TEXT_FRAMES = "//span[text()='Frames']";
+class MyFirstUITest extends BaseTest {
     private static final String BUTTON_TEXT_CLICK_ME = "//button[text()='Click Me']";
-    private static final String LABEL_FOR_YES_RADIO = "//label[@for='yesRadio']";
     private static final String SCROLL_INTO_VIEW_SCRIPT = "arguments[0].scrollIntoView(true)";
-    WebDriver driver;
-    JavascriptExecutor js;
 
     @Test
     void clickFormsCard() {
-        WebElement formsCard = driver.findElement(By.xpath(FORMS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, formsCard);
-        formsCard.click();
+        homePage.goToForms();
         WebElement centerDiv = driver.findElement(By.className("col-md-6"));
         String text = centerDiv.getText();
         assertEquals("Please select an item from left to start practice.", text);
@@ -45,25 +29,18 @@ class MyFirstUITest {
 
     @Test
     void chooseRadioButton() {
-        WebElement elementsCard = driver.findElement(By.xpath(ELEMENTS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, elementsCard);
-        elementsCard.click();
-        WebElement radioButtonMenuItem = driver.findElement(By.xpath(SPAN_TEXT_RADIO_BUTTON));
-        radioButtonMenuItem.click();
-        WebElement yesRadio = driver.findElement(By.xpath(LABEL_FOR_YES_RADIO));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, yesRadio);
-        yesRadio.click();
-        WebElement resultSpan = driver.findElement(By.className("text-success"));
-        assertEquals("Yes", resultSpan.getText());
+        homePage.goToElements();
+        leftMenuPage.chooseRadioButton();
+        RadioButtonPage page = new RadioButtonPage(driver);
+        page.clickYesRadio();
+        String actualText = page.getSuccessText();
+        assertEquals("Yes", actualText);
     }
 
     @Test
     void inputUserName() {
-        WebElement elementsCard = driver.findElement(By.xpath(ELEMENTS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, elementsCard);
-        elementsCard.click();
-        WebElement textBoxMenuItem = driver.findElement(By.xpath(SPAN_TEXT_TEXT_BOX));
-        textBoxMenuItem.click();
+        homePage.goToElements();
+        leftMenuPage.chooseTextBox();
         WebElement userNameInput = driver.findElement(By.id("userName"));
         String inputText = "user name";
         userNameInput.sendKeys(inputText);
@@ -76,11 +53,8 @@ class MyFirstUITest {
 
     @Test
     void inputUserEmail() {
-        WebElement elementsCard = driver.findElement(By.xpath(ELEMENTS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, elementsCard);
-        elementsCard.click();
-        WebElement textBoxMenuItem = driver.findElement(By.xpath(SPAN_TEXT_TEXT_BOX));
-        textBoxMenuItem.click();
+        homePage.goToForms();
+        leftMenuPage.chooseTextBox();
         WebElement userEmailInput = driver.findElement(By.id("userEmail"));
         String inputText = "a@g.com";
         userEmailInput.sendKeys(inputText);
@@ -93,11 +67,8 @@ class MyFirstUITest {
 
     @Test
     void clickMeButton() {
-        WebElement elementsCard = driver.findElement(By.xpath(ELEMENTS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, elementsCard);
-        elementsCard.click();
-        WebElement buttonsMenuItem = driver.findElement(By.xpath(SPAN_TEXT_BUTTONS));
-        buttonsMenuItem.click();
+        homePage.goToElements();
+        leftMenuPage.chooseButtons();
         WebElement clickMeButton = driver.findElement(By.xpath(BUTTON_TEXT_CLICK_ME));
         js.executeScript(SCROLL_INTO_VIEW_SCRIPT, clickMeButton);
         clickMeButton.click();
@@ -107,11 +78,8 @@ class MyFirstUITest {
 
     @Test
     void clickProgressBar() {
-        WebElement widgetsCard = driver.findElement(By.xpath(WIDGETS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, widgetsCard);
-        widgetsCard.click();
-        WebElement progressBarMenuItem = driver.findElement(By.xpath(SPAN_TEXT_PROGRESSBAR));
-        progressBarMenuItem.click();
+        homePage.goToWidgets();
+        leftMenuPage.chooseProgressbar();
         WebElement start = driver.findElement(By.id("startStopButton"));
         js.executeScript(SCROLL_INTO_VIEW_SCRIPT, start);
         start.click();
@@ -125,16 +93,13 @@ class MyFirstUITest {
 
     @Test
     void hoverTheButton() {
-        WebElement widgetsCard = driver.findElement(By.xpath(WIDGETS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, widgetsCard);
-        widgetsCard.click();
-        WebElement toolTipsMenuItem = driver.findElement(By.xpath(SPAN_TEXT_TOOL_TIPS));
-        toolTipsMenuItem.click();
+        homePage.goToWidgets();
+        leftMenuPage.chooseToolTips();
         WebElement toolTipButton = driver.findElement(By.id("toolTipButton"));
         new Actions(driver)
                 .pause(Duration.ofSeconds(3L))
                 .scrollToElement(toolTipButton)
-                .scrollByAmount(0,150)
+                .scrollByAmount(0, 150)
                 .moveToElement(toolTipButton)
                 .perform();
         Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(1L));
@@ -145,11 +110,8 @@ class MyFirstUITest {
 
     @Test
     void chooseTab() {
-        WebElement widgetsCard = driver.findElement(By.xpath(WIDGETS_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, widgetsCard);
-        widgetsCard.click();
-        WebElement tabsMenuItem = driver.findElement(By.xpath(SPAN_TEXT_TABS));
-        tabsMenuItem.click();
+        homePage.goToWidgets();
+        leftMenuPage.chooseTabs();
         WebElement tabUse = driver.findElement(By.id("demo-tab-use"));
         tabUse.click();
         WebElement tabPaneUse = driver.findElement(By.id("demo-tabpane-use"));
@@ -159,27 +121,11 @@ class MyFirstUITest {
 
     @Test
     void checkIFrameText() {
-        WebElement frameCard = driver.findElement(By.xpath(FRAME_CARD_TEXT));
-        js.executeScript(SCROLL_INTO_VIEW_SCRIPT, frameCard);
-        frameCard.click();
-        WebElement framesMenuItem = driver.findElement(By.xpath(SPAN_TEXT_FRAMES));
-        framesMenuItem.click();
+        homePage.goToFrame();
+        leftMenuPage.chooseFrames();
         WebElement iFrame = driver.findElement(By.id("frame1"));
         driver.switchTo().frame(iFrame);
         WebElement inTheFrame = driver.findElement(By.id("sampleHeading"));
         assertEquals("This is a sample page", inTheFrame.getText());
-    }
-
-    @BeforeEach
-    void setUp() {
-        driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofMillis(300));
-        js = (JavascriptExecutor) driver;
-        driver.get(ApplicationProperties.getBaseUrl());
-    }
-
-    @AfterEach
-    void tearDown() {
-        driver.quit();
     }
 }
